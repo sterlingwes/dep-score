@@ -1,8 +1,6 @@
-import fs from "node:fs";
 import { getAbbreviatedPackument, getPackument } from "query-registry";
 import type { Metadata, ScoreOptions, Semver, SemverWeights } from "./types";
-
-const defaultWeights: SemverWeights = { major: 100, minor: 10, patch: 1 };
+import { calculateScore, readPackageManifest } from "./utils";
 
 const defaultOptions: ScoreOptions = {
   includeAge: false,
@@ -10,14 +8,13 @@ const defaultOptions: ScoreOptions = {
 };
 
 const getDependencies = ({ includeDevDependencies } = defaultOptions) => {
-  const packageJson = fs.readFileSync("package.json").toString();
-  const { dependencies, devDependencies } = JSON.parse(packageJson);
-  return new Set(
-    Object.keys({
-      ...dependencies,
-      ...(includeDevDependencies ? devDependencies : {}),
-    })
-  );
+  const packageJson = readPackageManifest();
+  const { dependencies, devDependencies } = packageJson;
+  const depKeys = Object.keys({
+    ...dependencies,
+    ...(includeDevDependencies ? devDependencies : {}),
+  });
+  return new Set(depKeys);
 };
 
 const parseSemver = (version: string): Semver => {
@@ -27,27 +24,14 @@ const parseSemver = (version: string): Semver => {
   return [major, minor, patch];
 };
 
-const calculateScore = (semver: Semver): number => {
-  const [major, minor, patch] = semver;
-  if (!major) {
-    return minor * defaultWeights.major + patch * defaultWeights.minor;
-  }
-
-  return (
-    major * defaultWeights.major +
-    minor * defaultWeights.minor +
-    patch * defaultWeights.patch
-  );
-};
-
 const millisecondsPerDay = 1000 * 60 * 60 * 24;
 
 const fetchPackageDetails = async (
   moduleName: string,
   currentVersion: string,
-  { includeAge }: ScoreOptions
+  options?: ScoreOptions
 ) => {
-  if (includeAge) {
+  if (options?.includeAge) {
     const packument = await getPackument(moduleName);
     const latestVersion = packument["dist-tags"].latest;
     const currentTime = packument.time[currentVersion];
@@ -74,10 +58,9 @@ const fetchPackageDetails = async (
 
 const getPackageData = async (
   moduleName: string,
-  options: ScoreOptions
+  options?: ScoreOptions
 ): Promise<Metadata> => {
-  const packagePath = require.resolve(`${moduleName}/package.json`);
-  const manifest = JSON.parse(fs.readFileSync(packagePath).toString()) ?? {};
+  const manifest = readPackageManifest(moduleName);
   const { latestVersion, age } = await fetchPackageDetails(
     moduleName,
     manifest.version,
@@ -94,9 +77,9 @@ const getPackageData = async (
   };
 };
 
-export const getPackages = async (options: ScoreOptions) => {
+export const getPackages = async (options?: ScoreOptions) => {
   const moduleLookup = new Map<string, Metadata>();
-  const dependencies = getDependencies();
+  const dependencies = getDependencies(options);
   for (const dependency of dependencies) {
     const data = await getPackageData(dependency, options);
     moduleLookup.set(dependency, data);
