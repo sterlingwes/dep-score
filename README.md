@@ -15,3 +15,9 @@ To calculate the score we'll breakdown the semver into its constituent parts:
 For example, a dependency at 1.0.1 with 2.2.1 available would be (2*4 + 2*2 + 1*1) - (1*4 + 0*2 + 1*1) or 8.
 
 The age component is calculated separately to determine individual dependency ages, allowing for the calculation of maxes, minimums, and averages as desired.
+
+---
+
+Reconsider scoring approach that mixes calculation across semver segments and instead report the scores independently in the result for the consumer to use.
+
+Need to fix CLI script which has an issue with ES imports in the built dist.
