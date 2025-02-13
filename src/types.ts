@@ -19,4 +19,5 @@ export type SemverWeights = {
 export type ScoreOptions = {
   includeAge?: boolean;
   includeDevDependencies?: boolean;
+  weights?: Partial<SemverWeights>;
 };

@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import type { Metadata, Semver } from "./types";
+import type { Metadata, Semver, SemverWeights } from "./types";
 import { defaultWeights } from "./constants";
 
 export const sumScores = (moduleLookup: Map<string, Metadata>) => {
@@ -18,15 +18,16 @@ export const readPackageManifest = (moduleName?: string) => {
   return manifest;
 };
 
-export const calculateScore = (semver: Semver): number => {
+export const calculateScore = (
+  semver: Semver,
+  weightOverrides: Partial<SemverWeights> = defaultWeights
+): number => {
   const [major, minor, patch] = semver;
+  const weights = { ...defaultWeights, ...weightOverrides };
+
   if (!major) {
-    return minor * defaultWeights.major + patch * defaultWeights.minor;
+    return minor * weights.major + patch * weights.minor;
   }
 
-  return (
-    major * defaultWeights.major +
-    minor * defaultWeights.minor +
-    patch * defaultWeights.patch
-  );
+  return major * weights.major + minor * weights.minor + patch * weights.patch;
 };

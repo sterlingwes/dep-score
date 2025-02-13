@@ -91,6 +91,19 @@ describe("programmatic api", () => {
       const result = await getDepScore({ includeDevDependencies: true });
       expect(result.score).toBe(latestScore - currentScore);
     });
+
+    describe("overrides", () => {
+      it("should allow overriding semver weights", async () => {
+        mockExternals();
+
+        const result = await getDepScore({
+          weights: {
+            major: 1000,
+          },
+        });
+        expect(result.score).toBe(1995); // entirely the react score (no dev deps: jest)
+      });
+    });
   });
 
   describe("runtime only score (default)", () => {

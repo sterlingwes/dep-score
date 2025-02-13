@@ -68,8 +68,8 @@ const getPackageData = async (
   );
   const latestSemver = parseSemver(latestVersion);
   const currentSemver = parseSemver(manifest.version);
-  const latestScore = calculateScore(latestSemver);
-  const currentScore = calculateScore(currentSemver);
+  const latestScore = calculateScore(latestSemver, options?.weights);
+  const currentScore = calculateScore(currentSemver, options?.weights);
   const score = latestScore - currentScore;
   return {
     versions: { current: currentSemver, latest: latestSemver, score },
