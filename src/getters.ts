@@ -1,20 +1,15 @@
 import fs from "node:fs";
-import { performance } from "node:perf_hooks";
 import { getAbbreviatedPackument, getPackument } from "query-registry";
-
-type SemverWeights = {
-  major: number;
-  minor: number;
-  patch: number;
-};
+import type { Metadata, ScoreOptions, Semver, SemverWeights } from "./types";
 
 const defaultWeights: SemverWeights = { major: 100, minor: 10, patch: 1 };
 
-const includeAge = process.argv.includes("--age");
-const includeDevDependencies = process.argv.includes("--dev");
-const verbose = process.argv.includes("--verbose");
+const defaultOptions: ScoreOptions = {
+  includeAge: false,
+  includeDevDependencies: false,
+};
 
-const getDependencies = () => {
+const getDependencies = ({ includeDevDependencies } = defaultOptions) => {
   const packageJson = fs.readFileSync("package.json").toString();
   const { dependencies, devDependencies } = JSON.parse(packageJson);
   return new Set(
@@ -23,18 +18,6 @@ const getDependencies = () => {
       ...(includeDevDependencies ? devDependencies : {}),
     })
   );
-};
-
-// major, minor, patch
-type Semver = [number, number, number];
-
-type Metadata = {
-  versions: {
-    current: Semver;
-    latest: Semver;
-    score: number;
-  };
-  age: number | undefined;
 };
 
 const parseSemver = (version: string): Semver => {
@@ -61,7 +44,8 @@ const millisecondsPerDay = 1000 * 60 * 60 * 24;
 
 const fetchPackageDetails = async (
   moduleName: string,
-  currentVersion: string
+  currentVersion: string,
+  { includeAge }: ScoreOptions
 ) => {
   if (includeAge) {
     const packument = await getPackument(moduleName);
@@ -88,12 +72,16 @@ const fetchPackageDetails = async (
   return { latestVersion };
 };
 
-const getPackageData = async (moduleName: string): Promise<Metadata> => {
+const getPackageData = async (
+  moduleName: string,
+  options: ScoreOptions
+): Promise<Metadata> => {
   const packagePath = require.resolve(`${moduleName}/package.json`);
   const manifest = JSON.parse(fs.readFileSync(packagePath).toString()) ?? {};
   const { latestVersion, age } = await fetchPackageDetails(
     moduleName,
-    manifest.version
+    manifest.version,
+    options
   );
   const latestSemver = parseSemver(latestVersion);
   const currentSemver = parseSemver(manifest.version);
@@ -106,45 +94,13 @@ const getPackageData = async (moduleName: string): Promise<Metadata> => {
   };
 };
 
-const getPackages = async () => {
+export const getPackages = async (options: ScoreOptions) => {
   const moduleLookup = new Map<string, Metadata>();
   const dependencies = getDependencies();
   for (const dependency of dependencies) {
-    const data = await getPackageData(dependency);
+    const data = await getPackageData(dependency, options);
     moduleLookup.set(dependency, data);
   }
 
   return moduleLookup;
 };
-
-const sumScores = (moduleLookup: Map<string, Metadata>) => {
-  let total = 0;
-  for (const { versions } of moduleLookup.values()) {
-    total += versions.score;
-  }
-  return total;
-};
-
-const logTable = (moduleLookup: Map<string, Metadata>) => {
-  console.table(
-    Array.from(moduleLookup.entries()).map(([name, { versions, age }]) => ({
-      name,
-      current: versions.current.join("."),
-      latest: versions.latest.join("."),
-      score: versions.score,
-      days: age,
-    })),
-    ["name", "current", "latest", "score"].concat(includeAge ? ["days"] : [])
-  );
-};
-
-const start = performance.now();
-getPackages().then((moduleLookup) => {
-  if (verbose) {
-    logTable(moduleLookup);
-  }
-
-  console.log("Your score: ", sumScores(moduleLookup));
-  console.log("Modules: ", moduleLookup.size);
-  console.log(`Time taken: ${performance.now() - start}ms`);
-});

@@ -1,10 +1,15 @@
 {
   "name": "dep-score",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "bin": "bun build --compile --minify --sourcemap --bytecode ./src/main.ts --outfile bin",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "tsc --noEmit",
+    "build": "tsc"
+  },
+  "bin": {
+    "dep-score": "bin/cli.sh"
   },
   "keywords": [],
   "author": "",
