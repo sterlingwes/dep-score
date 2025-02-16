@@ -2,8 +2,12 @@ import fs from "node:fs";
 import { createRequire } from "node:module";
 import type { Metadata } from "./types.js";
 
-console.log(">>", import.meta.dirname);
-const require = createRequire(import.meta.dirname);
+const requirePath = import.meta.dirname;
+if (!requirePath) {
+  throw new Error("dep-score requires node >=20");
+}
+
+const require = createRequire(requirePath);
 
 export const sumScores = (moduleLookup: Map<string, Metadata>) => {
   let total = 0;
