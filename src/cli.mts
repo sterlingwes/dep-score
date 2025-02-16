@@ -29,7 +29,7 @@ getPackages({ includeAge, includeDevDependencies }).then((moduleLookup) => {
   }
 
   console.log(`\ndep-score v${manifest.version}\n`);
-  console.log("Your score: ", sumScores(moduleLookup));
-  console.log("Modules: ", moduleLookup.size);
-  console.log(`Time taken: ${performance.now() - start}ms`);
+  console.log("Your score:\t", sumScores(moduleLookup));
+  console.log("Modules:\t", moduleLookup.size);
+  console.log(`\nTime taken: ${performance.now() - start}ms`);
 });
