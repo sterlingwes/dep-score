@@ -1,6 +1,6 @@
 import { performance } from "node:perf_hooks";
 
-import { getPackages } from "./getters";
+import { getPackages } from "./packages";
 import { sumScores } from "./utils";
 import type { Metadata } from "./types";
 

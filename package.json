@@ -6,7 +6,8 @@
     "bin": "bun build --compile --minify --sourcemap --bytecode ./src/main.ts --outfile bin",
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc --noEmit",
-    "build": "tsc"
+    "build": "tsc",
+    "fixture": "bun run src/fixtures/fetch.ts"
   },
   "bin": {
     "dep-score": "bin/cli.sh"

@@ -5,19 +5,3 @@ Calculate a score for dev and direct node/npm dependencies of a project using a 
 Useful for teams to understand how old their dependencies are and the trend of pay-down of this form of technical debt over time.
 
 Future cases could include security audit reports based on severity with a weighting applied to those.
-
-To calculate the score we'll breakdown the semver into its constituent parts:
-
-- patch - these are the lowest value (1), unless major is 0, then they're considered minor (2)
-- minor - these are slightly higher value than patch, unless the major is 0 (2)
-- major - the version bump that typically takes the most effort (4)
-
-For example, a dependency at 1.0.1 with 2.2.1 available would be (2*4 + 2*2 + 1*1) - (1*4 + 0*2 + 1*1) or 8.
-
-The age component is calculated separately to determine individual dependency ages, allowing for the calculation of maxes, minimums, and averages as desired.
-
----
-
-Reconsider scoring approach that mixes calculation across semver segments and instead report the scores independently in the result for the consumer to use.
-
-Need to fix CLI script which has an issue with ES imports in the built dist.

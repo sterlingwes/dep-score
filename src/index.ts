@@ -1,4 +1,4 @@
-import { getPackages } from "./getters";
+import { getPackages } from "./packages";
 import type { ScoreOptions } from "./types";
 import { sumScores } from "./utils";
 

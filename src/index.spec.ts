@@ -1,8 +1,7 @@
 import { describe, it, expect, mock } from "bun:test";
 
 import { getDepScore } from "./index";
-import { calculateScore } from "./utils";
-import { Semver } from "./types";
+import { calculateScore } from "./score";
 
 describe("programmatic api", () => {
   const latestVersions = {
@@ -72,16 +71,16 @@ describe("programmatic api", () => {
     it("should diff latest and current version", async () => {
       const latestScore = Object.entries(latestVersions).reduce(
         (score, [, version]) => {
-          const versionParts = version.split(".").map(Number);
-          return calculateScore(versionParts as Semver) + score;
+          const versionParts = version.split(".");
+          return calculateScore(versionParts) + score;
         },
         0
       );
 
       const currentScore = Object.entries(currentVersions).reduce(
         (score, [, version]) => {
-          const versionParts = version.split(".").map(Number);
-          return calculateScore(versionParts as Semver) + score;
+          const versionParts = version.split(".");
+          return calculateScore(versionParts) + score;
         },
         0
       );
@@ -90,19 +89,6 @@ describe("programmatic api", () => {
 
       const result = await getDepScore({ includeDevDependencies: true });
       expect(result.score).toBe(latestScore - currentScore);
-    });
-
-    describe("overrides", () => {
-      it("should allow overriding semver weights", async () => {
-        mockExternals();
-
-        const result = await getDepScore({
-          weights: {
-            major: 1000,
-          },
-        });
-        expect(result.score).toBe(1995); // entirely the react score (no dev deps: jest)
-      });
     });
   });
 
@@ -143,11 +129,11 @@ describe("programmatic api", () => {
                   0,
                   0,
                 ],
-                "score": 195,
+                "score": 1999995,
               },
             },
           },
-          "score": 195,
+          "score": 1999995,
         }
       `);
     });
