@@ -40,7 +40,12 @@ const fetchPackageDetails = async (
         ),
       };
     } catch (e: any) {
-      console.log(`Failed to fetch packument for ${moduleName}: ${e.message}`);
+      console.log(
+        `Failed to fetch packument for ${moduleName}: ${e.message.slice(
+          0,
+          100
+        )}`
+      );
     } finally {
       return { latestVersion: currentVersion, age: undefined };
     }
@@ -52,7 +57,10 @@ const fetchPackageDetails = async (
     return { latestVersion };
   } catch (e: any) {
     console.log(
-      `Failed to fetch abbreviated packument for ${moduleName}: ${e.message}`
+      `Failed to fetch abbreviated packument for ${moduleName}: ${e.message.slice(
+        0,
+        100
+      )}`
     );
     return { latestVersion: currentVersion };
   }

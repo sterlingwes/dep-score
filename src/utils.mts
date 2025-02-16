@@ -2,12 +2,7 @@ import fs from "node:fs";
 import { createRequire } from "node:module";
 import type { Metadata } from "./types.js";
 
-const requirePath = import.meta.dirname;
-if (!requirePath) {
-  throw new Error("dep-score requires node >=20");
-}
-
-const require = createRequire(requirePath);
+const require = createRequire(process.cwd());
 
 export const sumScores = (moduleLookup: Map<string, Metadata>) => {
   let total = 0;
@@ -19,7 +14,7 @@ export const sumScores = (moduleLookup: Map<string, Metadata>) => {
 
 export const readPackageManifest = (moduleName?: string) => {
   const packagePath = require.resolve(
-    moduleName ? `${moduleName}/package.json` : "./package.json"
+    moduleName ? `${moduleName}/package.json` : `${process.cwd()}/package.json`
   );
   const manifest = JSON.parse(fs.readFileSync(packagePath).toString()) ?? {};
   return manifest;
