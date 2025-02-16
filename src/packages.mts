@@ -21,6 +21,17 @@ const getDependencies = ({ includeDevDependencies } = defaultOptions) => {
 
 const millisecondsPerDay = 1000 * 60 * 60 * 24;
 
+let zodIssueLogged = false;
+
+const logIfZodIssue = (e: any) => {
+  if (e.issues?.length && !zodIssueLogged) {
+    zodIssueLogged = true;
+    console.warn(
+      `Detected Zod registry response validation issue that may indicate a bad global install of dep-score. Some versions of Zod do not validate the registry response correctly. Zod is a dependency of query-registry, which is a dependency of dep-score. Consider re-installing dep-score globally after uninstalling some of these global packages. Alternatively, do not install dep-score globally and use it as a dev dependency in your repository.`
+    );
+  }
+};
+
 const fetchPackageDetails = async (
   moduleName: string,
   currentVersion: string,
@@ -40,12 +51,8 @@ const fetchPackageDetails = async (
         ),
       };
     } catch (e: any) {
-      console.log(
-        `Failed to fetch packument for ${moduleName}: ${e.message.slice(
-          0,
-          100
-        )}`
-      );
+      logIfZodIssue(e);
+      console.log(`Failed to fetch packument for ${moduleName}`);
     } finally {
       return { latestVersion: currentVersion, age: undefined };
     }
@@ -56,12 +63,8 @@ const fetchPackageDetails = async (
     const latestVersion = packument["dist-tags"].latest;
     return { latestVersion };
   } catch (e: any) {
-    console.log(
-      `Failed to fetch abbreviated packument for ${moduleName}: ${e.message.slice(
-        0,
-        100
-      )}`
-    );
+    logIfZodIssue(e);
+    console.log(`Failed to fetch abbreviated packument for ${moduleName}`);
     return { latestVersion: currentVersion };
   }
 };
