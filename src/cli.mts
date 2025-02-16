@@ -1,5 +1,6 @@
 import { performance } from "node:perf_hooks";
 
+import manifest from "../package.json";
 import { getPackages } from "./packages.mjs";
 import { sumScores } from "./utils.mjs";
 import type { Metadata } from "./types.js";
@@ -27,6 +28,7 @@ getPackages({ includeAge, includeDevDependencies }).then((moduleLookup) => {
     logTable(moduleLookup);
   }
 
+  console.log(`\ndep-score v${manifest.version}\n\n`);
   console.log("Your score: ", sumScores(moduleLookup));
   console.log("Modules: ", moduleLookup.size);
   console.log(`Time taken: ${performance.now() - start}ms`);

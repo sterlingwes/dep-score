@@ -27,28 +27,35 @@ const fetchPackageDetails = async (
   options?: ScoreOptions
 ) => {
   if (options?.includeAge) {
-    const packument = await getPackument(moduleName);
-    const latestVersion = packument["dist-tags"].latest;
-    const currentTime = packument.time[currentVersion];
-    const latestTime = packument.time[latestVersion];
-    console.log(
-      moduleName,
-      currentVersion,
-      currentTime,
-      latestVersion,
-      latestTime
-    );
-    return {
-      latestVersion,
-      age: Math.floor(
-        (Date.parse(latestTime) - Date.parse(currentTime)) / millisecondsPerDay
-      ),
-    };
+    try {
+      const packument = await getPackument(moduleName);
+      const latestVersion = packument["dist-tags"].latest;
+      const currentTime = packument.time[currentVersion];
+      const latestTime = packument.time[latestVersion];
+      return {
+        latestVersion,
+        age: Math.floor(
+          (Date.parse(latestTime) - Date.parse(currentTime)) /
+            millisecondsPerDay
+        ),
+      };
+    } catch (e: any) {
+      console.log(`Failed to fetch packument for ${moduleName}: ${e.message}`);
+    } finally {
+      return { latestVersion: currentVersion, age: undefined };
+    }
   }
 
-  const packument = await getAbbreviatedPackument(moduleName);
-  const latestVersion = packument["dist-tags"].latest;
-  return { latestVersion };
+  try {
+    const packument = await getAbbreviatedPackument(moduleName);
+    const latestVersion = packument["dist-tags"].latest;
+    return { latestVersion };
+  } catch (e: any) {
+    console.log(
+      `Failed to fetch abbreviated packument for ${moduleName}: ${e.message}`
+    );
+    return { latestVersion: currentVersion };
+  }
 };
 
 const getPackageData = async (

@@ -1,6 +1,6 @@
 {
   "name": "dep-score",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "main": "dist/index.mjs",
   "scripts": {
     "bin": "bun build --compile --minify --sourcemap --bytecode ./src/main.ts --outfile bin",
