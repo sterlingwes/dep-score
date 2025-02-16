@@ -1,7 +1,7 @@
 import { describe, it, expect, mock } from "bun:test";
 
-import { getDepScore } from "./index";
-import { calculateScore } from "./score";
+import { getDepScore } from "./index.mts";
+import { calculateScore } from "./score.mts";
 
 describe("programmatic api", () => {
   const latestVersions = {

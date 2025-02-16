@@ -1,7 +1,7 @@
 {
   "name": "dep-score",
-  "version": "0.0.1",
-  "main": "dist/index.js",
+  "version": "0.0.2",
+  "main": "dist/index.mjs",
   "scripts": {
     "bin": "bun build --compile --minify --sourcemap --bytecode ./src/main.ts --outfile bin",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,9 +9,7 @@
     "build": "rm -rf dist/* && tsc",
     "fixture": "bun run src/fixtures/fetch.ts"
   },
-  "bin": {
-    "dep-score": "bin/cli.mjs"
-  },
+  "bin": "bin/cli.mjs",
   "keywords": [],
   "author": "",
   "license": "MIT",
@@ -22,5 +20,8 @@
   },
   "dependencies": {
     "query-registry": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   }
 }

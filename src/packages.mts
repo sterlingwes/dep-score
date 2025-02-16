@@ -1,8 +1,8 @@
 import { getAbbreviatedPackument, getPackument } from "query-registry";
-import type { Metadata, ScoreOptions } from "./types";
-import { readPackageManifest } from "./utils";
-import { asNumbers, parseSemver } from "./semver";
-import { calculateScore, semverScoreDiff } from "./score";
+import type { Metadata, ScoreOptions } from "./types.js";
+import { readPackageManifest } from "./utils.mjs";
+import { asNumbers, parseSemver } from "./semver.mjs";
+import { calculateScore, semverScoreDiff } from "./score.mjs";
 
 const defaultOptions: ScoreOptions = {
   includeAge: false,

@@ -1,8 +1,8 @@
 import { performance } from "node:perf_hooks";
 
-import { getPackages } from "./packages";
-import { sumScores } from "./utils";
-import type { Metadata } from "./types";
+import { getPackages } from "./packages.mjs";
+import { sumScores } from "./utils.mjs";
+import type { Metadata } from "./types.js";
 
 const includeAge = process.argv.includes("--age");
 const includeDevDependencies = process.argv.includes("--dev");
