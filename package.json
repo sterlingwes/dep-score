@@ -9,7 +9,10 @@
     "build": "rm -rf dist/* && tsc && rm dist/package.json && mv dist/src/* dist/ && rm -rf dist/src",
     "fixture": "bun run src/fixtures/fetch.ts"
   },
-  "repository": "github:sterlingwes/dep-score",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sterlingwes/dep-score.git"
+  },
   "bin": "bin/cli.mjs",
   "keywords": [],
   "author": "",
