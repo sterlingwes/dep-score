@@ -8,6 +8,7 @@ export type Metadata = {
 };
 
 export type ScoreOptions = {
+  projectPath?: string;
   includeAge?: boolean;
   includeDevDependencies?: boolean;
 };

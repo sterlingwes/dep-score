@@ -2,8 +2,7 @@ import fs from "node:fs";
 import { createRequire } from "node:module";
 import type { Metadata } from "./types.js";
 
-const cwd = process.cwd();
-const require = createRequire(cwd);
+const require = createRequire(process.cwd());
 
 export const sumScores = (moduleLookup: Map<string, Metadata>) => {
   let total = 0;
@@ -13,7 +12,10 @@ export const sumScores = (moduleLookup: Map<string, Metadata>) => {
   return total;
 };
 
-export const readPackageManifest = (moduleName?: string) => {
+export const readPackageManifest = (
+  moduleName?: string,
+  cwd = process.cwd()
+) => {
   const packagePath = require.resolve(
     moduleName
       ? `${cwd}/node_modules/${moduleName}/package.json`
@@ -21,4 +23,11 @@ export const readPackageManifest = (moduleName?: string) => {
   );
   const manifest = JSON.parse(fs.readFileSync(packagePath).toString()) ?? {};
   return manifest;
+};
+
+export const formatOutput = (packageLookup: Map<string, Metadata>) => {
+  return {
+    score: sumScores(packageLookup),
+    modules: Object.fromEntries(packageLookup),
+  };
 };

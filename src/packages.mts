@@ -9,8 +9,11 @@ const defaultOptions: ScoreOptions = {
   includeDevDependencies: false,
 };
 
-const getDependencies = ({ includeDevDependencies } = defaultOptions) => {
-  const packageJson = readPackageManifest();
+const getDependencies = ({
+  includeDevDependencies,
+  projectPath,
+} = defaultOptions) => {
+  const packageJson = readPackageManifest(undefined, projectPath);
   const { dependencies, devDependencies } = packageJson;
   const depKeys = Object.keys({
     ...dependencies,
@@ -73,7 +76,7 @@ const getPackageData = async (
   moduleName: string,
   options?: ScoreOptions
 ): Promise<Metadata> => {
-  const manifest = readPackageManifest(moduleName);
+  const manifest = readPackageManifest(moduleName, options?.projectPath);
   const { latestVersion, age } = await fetchPackageDetails(
     moduleName,
     manifest.version,

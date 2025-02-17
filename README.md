@@ -18,6 +18,7 @@ const score = getDepScore();
 
 - `includeDevDependencies` (boolean) - include dev dependencies in your total score; defaults to false
 - `includeAge` (boolean) - includes a value representing the number of days between the date of your current version and the latest release, for a specific dependency (this increases runtime as we need to fetch a larger resource from the registry)
+- `projectPath` (string) - relative or absolute path to the project you want to calculate a score for (path needs to have node_modules installed and a package.json present)
 
 The method returns a promise which resolves to an object with the following shape:
 
@@ -34,6 +35,8 @@ Supports the following options:
 
 - `--dev`, see `includeDevDependencies` above
 - `--age`, see `includeAge` above
+- `--path`, see `projectPath` above
+- `--json`, provide a path to write the full JSON result to, example: `--json ./dep-score.json`
 - `--verbose`
 
 ## Score Calculation
