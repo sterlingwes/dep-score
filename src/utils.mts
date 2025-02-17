@@ -1,5 +1,7 @@
 import fs from "node:fs";
 import { createRequire } from "node:module";
+import yarnLock from "@yarnpkg/lockfile";
+
 import type { Metadata } from "./types.js";
 
 const require = createRequire(process.cwd());
@@ -23,6 +25,35 @@ export const readPackageManifest = (
   );
   const manifest = JSON.parse(fs.readFileSync(packagePath).toString()) ?? {};
   return manifest;
+};
+
+const getModuleName = (moduleNameWithVersionConstraint: string) => {
+  if (moduleNameWithVersionConstraint.startsWith("@")) {
+    return "@" + moduleNameWithVersionConstraint.slice(1).split("@").shift();
+  }
+
+  return (
+    moduleNameWithVersionConstraint.split("@").shift() ??
+    moduleNameWithVersionConstraint
+  );
+};
+
+export const readYarnLockfile = (cwd = process.cwd()) => {
+  try {
+    const lockfile = fs.readFileSync(`${cwd}/yarn.lock`).toString();
+    const parsed = yarnLock.parse(lockfile);
+    if (parsed?.object) {
+      return Object.keys(parsed.object).reduce(
+        (acc, key) => ({
+          ...acc,
+          [getModuleName(key)]: { version: parsed.object[key].version },
+        }),
+        {}
+      );
+    }
+  } catch (_) {
+    return undefined;
+  }
 };
 
 export const formatOutput = (packageLookup: Map<string, Metadata>) => {

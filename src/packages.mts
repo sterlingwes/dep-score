@@ -1,6 +1,6 @@
 import { getAbbreviatedPackument, getPackument } from "query-registry";
-import type { Metadata, ScoreOptions } from "./types.js";
-import { readPackageManifest } from "./utils.mjs";
+import type { Lockfile, Metadata, ScoreOptions } from "./types.js";
+import { readPackageManifest, readYarnLockfile } from "./utils.mjs";
 import { asNumbers, parseSemver } from "./semver.mjs";
 import { calculateScore, semverScoreDiff } from "./score.mjs";
 
@@ -74,16 +74,27 @@ const fetchPackageDetails = async (
 
 const getPackageData = async (
   moduleName: string,
-  options?: ScoreOptions
+  options?: ScoreOptions,
+  lockfile?: Lockfile
 ): Promise<Metadata> => {
-  const manifest = readPackageManifest(moduleName, options?.projectPath);
+  let version = "";
+  if (lockfile?.[moduleName]) {
+    console.log("lockfile", moduleName, lockfile[moduleName].version);
+    version = lockfile[moduleName].version;
+  }
+
+  if (!version) {
+    const manifest = readPackageManifest(moduleName, options?.projectPath);
+    version = manifest.version;
+  }
+
   const { latestVersion, age } = await fetchPackageDetails(
     moduleName,
-    manifest.version,
+    version,
     options
   );
   const latestSemver = parseSemver(latestVersion);
-  const currentSemver = parseSemver(manifest.version);
+  const currentSemver = parseSemver(version);
   const score = semverScoreDiff(currentSemver, latestSemver);
   return {
     versions: {
@@ -98,8 +109,9 @@ const getPackageData = async (
 export const getPackages = async (options?: ScoreOptions) => {
   const moduleLookup = new Map<string, Metadata>();
   const dependencies = getDependencies(options);
+  const yarnLock = readYarnLockfile(options?.projectPath);
   for (const dependency of dependencies) {
-    const data = await getPackageData(dependency, options);
+    const data = await getPackageData(dependency, options, yarnLock);
     moduleLookup.set(dependency, data);
   }
 

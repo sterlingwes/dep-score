@@ -12,3 +12,9 @@ export type ScoreOptions = {
   includeAge?: boolean;
   includeDevDependencies?: boolean;
 };
+
+export type Lockfile = {
+  [packageName: string]: {
+    version: string;
+  };
+};

@@ -1,6 +1,6 @@
 {
   "name": "dep-score",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "main": "dist/index.mjs",
   "scripts": {
     "bin": "bun build --compile --minify --sourcemap --bytecode ./src/main.ts --outfile bin",
@@ -17,10 +17,12 @@
   "description": "",
   "devDependencies": {
     "@types/bun": "latest",
+    "@types/yarnpkg__lockfile": "^1.1.9",
     "prettier": "^3.5.1",
     "typescript": "^5.7.3"
   },
   "dependencies": {
+    "@yarnpkg/lockfile": "^1.1.0",
     "query-registry": "^4.0.0"
   },
   "engines": {
