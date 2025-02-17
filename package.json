@@ -9,15 +9,16 @@
     "build": "rm -rf dist/* && tsc && rm dist/package.json && mv dist/src/* dist/ && rm -rf dist/src",
     "fixture": "bun run src/fixtures/fetch.ts"
   },
-  "repository": "https://github.com/sterlingwes/dep-score",
+  "repository": "github:sterlingwes/dep-score",
   "bin": "bin/cli.mjs",
   "keywords": [],
   "author": "",
   "license": "MIT",
   "description": "",
   "devDependencies": {
-    "typescript": "^5.7.3",
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "prettier": "^3.5.1",
+    "typescript": "^5.7.3"
   },
   "dependencies": {
     "query-registry": "^4.0.0"
