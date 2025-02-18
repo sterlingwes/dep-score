@@ -19,10 +19,12 @@ const score = getDepScore();
 - `includeDevDependencies` (boolean) - include dev dependencies in your total score; defaults to false
 - `includeAge` (boolean) - includes a value representing the number of days between the date of your current version and the latest release, for a specific dependency (this increases runtime as we need to fetch a larger resource from the registry)
 - `projectPath` (string) - relative or absolute path to the project you want to calculate a score for (path needs to have node_modules installed and a package.json present)
+- `tagGroups` ({ tag: [moduleA, moduleB] }) - tag groups which allow for tracking scores across groups of dependencies; "runtime" and "dev" included by default based on which group the module is in the package.json
 
 The method returns a promise which resolves to an object with the following shape:
 
 - `score` (integer) - sum of all dependency score diffs between the value for the latest semver and the current
+- `tagScores` ({ tag: number }) - score subtotals by dependency tag
 - `modules` object lookup of dependencies keyed by module name, with `Metadata` object values ([see types](src/types.ts))
 
 ## CLI
