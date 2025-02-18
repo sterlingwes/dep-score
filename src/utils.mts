@@ -59,6 +59,48 @@ export const readYarnLockfile = (cwd = process.cwd()) => {
 export const formatOutput = (packageLookup: Map<string, Metadata>) => {
   return {
     score: sumScores(packageLookup),
+    tagScores: Array.from(packageLookup.values()).reduce(
+      (acc, { tags, versions: { score } }) => {
+        for (const tag of tags) {
+          if (!acc[tag]) {
+            acc[tag] = 0;
+          }
+          acc[tag] += score;
+        }
+        return acc;
+      },
+      {} as Record<string, number>
+    ),
     modules: Object.fromEntries(packageLookup),
   };
+};
+
+/**
+ * @param tagGroups object lookup with keys as tag names and values as arrays of package names
+ */
+export const invertTagGroups = (
+  tagGroups: Record<string, string[]>
+): Record<string, string[]> => {
+  const invertedTagGroups: Record<string, string[]> = {};
+  for (const [tag, packages] of Object.entries(tagGroups)) {
+    for (const packageName of packages) {
+      if (!invertedTagGroups[packageName]) {
+        invertedTagGroups[packageName] = [];
+      }
+      invertedTagGroups[packageName].push(tag);
+    }
+  }
+  return invertedTagGroups;
+};
+
+export const withUserTags = (
+  moduleName: string,
+  tags: string[],
+  invertedTagGroups?: Record<string, string[]>
+) => {
+  const userTags = invertedTagGroups?.[moduleName] ?? [];
+  if (userTags.length === 0) {
+    return tags;
+  }
+  return Array.from(new Set([...tags, ...userTags]));
 };

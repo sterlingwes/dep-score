@@ -2,7 +2,7 @@ import { resolve } from "node:path";
 
 import { getPackages } from "./packages.mjs";
 import type { ScoreOptions } from "./types.js";
-import { formatOutput, sumScores } from "./utils.mjs";
+import { formatOutput } from "./utils.mjs";
 
 const transformOptions = (options?: ScoreOptions) => {
   if (options?.projectPath) {

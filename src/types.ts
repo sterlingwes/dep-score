@@ -1,4 +1,5 @@
 export type Metadata = {
+  tags: string[];
   versions: {
     current: number[];
     latest: number[];
@@ -7,11 +8,16 @@ export type Metadata = {
   age: number | undefined;
 };
 
-export type ScoreOptions = {
+export interface ScoreOptions {
   projectPath?: string;
   includeAge?: boolean;
   includeDevDependencies?: boolean;
-};
+  tagGroups?: Record<string, string[]>;
+}
+
+export interface InternalScoreOptions extends ScoreOptions {
+  invertedTagGroups?: Record<string, string[]>;
+}
 
 export type Lockfile = {
   [packageName: string]: {

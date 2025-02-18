@@ -1,6 +1,16 @@
 import { getAbbreviatedPackument, getPackument } from "query-registry";
-import type { Lockfile, Metadata, ScoreOptions } from "./types.js";
-import { readPackageManifest, readYarnLockfile } from "./utils.mjs";
+import type {
+  InternalScoreOptions,
+  Lockfile,
+  Metadata,
+  ScoreOptions,
+} from "./types.js";
+import {
+  invertTagGroups,
+  readPackageManifest,
+  readYarnLockfile,
+  withUserTags,
+} from "./utils.mjs";
 import { asNumbers, parseSemver } from "./semver.mjs";
 import { calculateScore, semverScoreDiff } from "./score.mjs";
 
@@ -15,11 +25,12 @@ const getDependencies = ({
 } = defaultOptions) => {
   const packageJson = readPackageManifest(undefined, projectPath);
   const { dependencies, devDependencies } = packageJson;
-  const depKeys = Object.keys({
-    ...dependencies,
-    ...(includeDevDependencies ? devDependencies : {}),
-  });
-  return new Set(depKeys);
+  return {
+    runtime: new Set(Object.keys(dependencies || {})),
+    dev: includeDevDependencies
+      ? new Set(Object.keys(devDependencies || {}))
+      : new Set<string>(),
+  };
 };
 
 const millisecondsPerDay = 1000 * 60 * 60 * 24;
@@ -72,11 +83,17 @@ const fetchPackageDetails = async (
   }
 };
 
-const getPackageData = async (
-  moduleName: string,
-  options?: ScoreOptions,
-  lockfile?: Lockfile
-): Promise<Metadata> => {
+const getPackageData = async ({
+  moduleName,
+  isDev,
+  options,
+  lockfile,
+}: {
+  moduleName: string;
+  isDev: boolean;
+  options?: InternalScoreOptions;
+  lockfile?: Lockfile;
+}): Promise<Metadata> => {
   let version = "";
   if (lockfile?.[moduleName]) {
     version = lockfile[moduleName].version;
@@ -96,6 +113,11 @@ const getPackageData = async (
   const currentSemver = parseSemver(version);
   const score = semverScoreDiff(currentSemver, latestSemver);
   return {
+    tags: withUserTags(
+      moduleName,
+      isDev ? ["dev"] : ["runtime"],
+      options?.invertedTagGroups
+    ),
     versions: {
       current: asNumbers(currentSemver),
       latest: asNumbers(latestSemver),
@@ -107,10 +129,18 @@ const getPackageData = async (
 
 export const getPackages = async (options?: ScoreOptions) => {
   const moduleLookup = new Map<string, Metadata>();
-  const dependencies = getDependencies(options);
+  const { runtime, dev } = getDependencies(options);
   const yarnLock = readYarnLockfile(options?.projectPath);
-  for (const dependency of dependencies) {
-    const data = await getPackageData(dependency, options, yarnLock);
+  const invertedTagGroups = options?.tagGroups
+    ? invertTagGroups(options.tagGroups)
+    : undefined;
+  for (const dependency of [...runtime, ...dev]) {
+    const data = await getPackageData({
+      moduleName: dependency,
+      isDev: dev.has(dependency),
+      options: { ...options, invertedTagGroups },
+      lockfile: yarnLock,
+    });
     moduleLookup.set(dependency, data);
   }
 

@@ -92,6 +92,15 @@ describe("programmatic api", () => {
     });
   });
 
+  describe("tagging", () => {
+    it("should attach a tag to the dependency if it is in the tag group provided", async () => {
+      mockExternals();
+
+      const result = await getDepScore({ tagGroups: { core: ["react"] } });
+      expect(result.modules.react.tags).toEqual(["runtime", "core"]);
+    });
+  });
+
   describe("runtime only score (default)", () => {
     it("should return score and lookup", async () => {
       mockExternals();
@@ -102,6 +111,9 @@ describe("programmatic api", () => {
           "modules": {
             "lodash": {
               "age": undefined,
+              "tags": [
+                "runtime",
+              ],
               "versions": {
                 "current": [
                   4,
@@ -118,6 +130,9 @@ describe("programmatic api", () => {
             },
             "react": {
               "age": undefined,
+              "tags": [
+                "runtime",
+              ],
               "versions": {
                 "current": [
                   17,
@@ -134,6 +149,9 @@ describe("programmatic api", () => {
             },
           },
           "score": 1999995,
+          "tagScores": {
+            "runtime": 1999995,
+          },
         }
       `);
     });
