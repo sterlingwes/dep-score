@@ -20,6 +20,7 @@ const score = getDepScore();
 - `includeAge` (boolean) - includes a value representing the number of days between the date of your current version and the latest release, for a specific dependency (this increases runtime as we need to fetch a larger resource from the registry)
 - `projectPath` (string) - relative or absolute path to the project you want to calculate a score for (path needs to have node_modules installed and a package.json present)
 - `tagGroups` ({ tag: [moduleA, moduleB] }) - tag groups which allow for tracking scores across groups of dependencies; "runtime" and "dev" included by default based on which group the module is in the package.json
+- `shiftLeft` (string array) - dependencies for which you want the minor & patch versions to represent major & minor respectively; useful for those where the major version segment has been 0 for a long time
 
 The method returns a promise which resolves to an object with the following shape:
 
@@ -35,6 +36,7 @@ The command line interface should be used by installing dep-score in your reposi
 
 Supports the following options:
 
+- `--config`, a JSON file containing any of the options defined above for the programmatic API
 - `--dev`, see `includeDevDependencies` above
 - `--age`, see `includeAge` above
 - `--path`, see `projectPath` above

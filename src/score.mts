@@ -2,8 +2,12 @@ const leftPad = (value: number, padding = 3) => {
   return value.toString().padStart(padding, "0");
 };
 
-export const calculateScore = (semver: string[]): number => {
+export const calculateScore = (semver: string[], shiftLeft = false): number => {
   const parts = semver.slice();
+  if (shiftLeft) {
+    parts.shift();
+    parts.push("0");
+  }
   let score = "";
   let segments = 0;
   while (parts.length) {
@@ -17,9 +21,10 @@ export const calculateScore = (semver: string[]): number => {
 
 export const semverScoreDiff = (
   current: string[],
-  latest: string[]
+  latest: string[],
+  shiftLeft = false
 ): number => {
-  const currentScore = calculateScore(current);
-  const latestScore = calculateScore(latest);
+  const currentScore = calculateScore(current, shiftLeft);
+  const latestScore = calculateScore(latest, shiftLeft);
   return latestScore - currentScore;
 };

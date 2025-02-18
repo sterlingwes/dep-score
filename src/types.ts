@@ -13,6 +13,7 @@ export interface ScoreOptions {
   includeAge?: boolean;
   includeDevDependencies?: boolean;
   tagGroups?: Record<string, string[]>;
+  shiftLeft?: string[];
 }
 
 export interface InternalScoreOptions extends ScoreOptions {

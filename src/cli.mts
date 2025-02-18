@@ -1,12 +1,12 @@
-import { resolve } from "node:path";
-import { writeFileSync } from "node:fs";
 import { performance } from "node:perf_hooks";
 
 import manifest from "../package.json" with { type: "json" };
+import { resolve, readFileSync, writeFileSync } from "./fs.mjs";
 import { getPackages } from "./packages.mjs";
 import { formatOutput, sumScores } from "./utils.mjs";
-import type { Metadata } from "./types.js";
+import type { Metadata, ScoreOptions } from "./types.js";
 
+const hasConfig = process.argv.find((arg) => arg.startsWith("--config"));
 const includeAge = process.argv.includes("--age");
 const includeDevDependencies = process.argv.includes("--dev");
 const writeJson = process.argv.find((arg) => arg.startsWith("--json"));
@@ -30,6 +30,14 @@ if (useProjectPath) {
   }
 }
 
+let configPath = "";
+if (hasConfig) {
+  const configPathValue = process.argv[process.argv.indexOf(hasConfig) + 1];
+  if (!configPathValue.startsWith("-")) {
+    configPath = resolve(configPathValue);
+  }
+}
+
 const logTable = (moduleLookup: Map<string, Metadata>) => {
   console.table(
     Array.from(moduleLookup.entries()).map(([name, { versions, age }]) => ({
@@ -44,30 +52,43 @@ const logTable = (moduleLookup: Map<string, Metadata>) => {
 };
 
 const start = performance.now();
-getPackages({ includeAge, includeDevDependencies, projectPath }).then(
-  (moduleLookup) => {
-    if (verbose) {
-      console.log("dep-score options:", {
-        includeAge,
-        includeDevDependencies,
-        projectPath,
-        jsonPath,
-      });
 
-      logTable(moduleLookup);
-    }
-
-    console.log(`\ndep-score v${manifest.version}\n`);
-    console.log("Your score:\t", sumScores(moduleLookup));
-    console.log("Modules:\t", moduleLookup.size);
-
-    if (jsonPath) {
-      writeFileSync(
-        jsonPath,
-        JSON.stringify(formatOutput(moduleLookup), null, 2)
-      );
-    }
-
-    console.log(`\nTime taken: ${performance.now() - start}ms`);
+const resolveOptions = () => {
+  let configFile: Partial<ScoreOptions> = {};
+  if (configPath) {
+    configFile = JSON.parse(readFileSync(configPath)) ?? {};
   }
-);
+
+  return {
+    ...configFile,
+    includeAge,
+    includeDevDependencies,
+    projectPath,
+  };
+};
+
+const resolvedOptions = resolveOptions();
+getPackages(resolvedOptions).then((moduleLookup) => {
+  if (verbose) {
+    console.log("dep-score options:", {
+      ...resolvedOptions,
+      configPath,
+      jsonPath,
+    });
+
+    logTable(moduleLookup);
+  }
+
+  console.log(`\ndep-score v${manifest.version}\n`);
+  console.log("Your score:\t", sumScores(moduleLookup));
+  console.log("Modules:\t", moduleLookup.size);
+
+  if (jsonPath) {
+    writeFileSync(
+      jsonPath,
+      JSON.stringify(formatOutput(moduleLookup), null, 2)
+    );
+  }
+
+  console.log(`\nTime taken: ${performance.now() - start}ms`);
+});

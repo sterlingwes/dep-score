@@ -8,12 +8,14 @@ describe("programmatic api", () => {
     lodash: "4.17.21",
     react: "19.0.0",
     jest: "29.1.0",
+    "react-native": "0.76.1",
   };
 
   const currentVersions = {
     lodash: "4.17.21",
     react: "17.0.5",
     jest: "27.0.6",
+    "react-native": "0.74.8",
   };
 
   const mockExternals = () => {
@@ -24,6 +26,7 @@ describe("programmatic api", () => {
             dependencies: {
               lodash: "^4.17.21",
               react: "^17.0.2",
+              "react-native": "0.74.8",
             },
             devDependencies: {
               jest: "^27.0.6",
@@ -147,13 +150,43 @@ describe("programmatic api", () => {
                 "score": 1999995,
               },
             },
+            "react-native": {
+              "age": undefined,
+              "tags": [
+                "runtime",
+              ],
+              "versions": {
+                "current": [
+                  0,
+                  74,
+                  8,
+                ],
+                "latest": [
+                  0,
+                  76,
+                  1,
+                ],
+                "score": 1993,
+              },
+            },
           },
-          "score": 1999995,
+          "score": 2001988,
           "tagScores": {
-            "runtime": 1999995,
+            "runtime": 2001988,
           },
         }
       `);
+    });
+
+    describe("with react native shifted left", () => {
+      it("should return a higher score", async () => {
+        mockExternals();
+
+        const result = await getDepScore({ shiftLeft: ["react-native"] });
+        const newRNDiff = 76001000 - 74008000;
+        const oldRNDiff = 76001 - 74008;
+        expect(result.score).toBe(2001988 + newRNDiff - oldRNDiff);
+      });
     });
   });
 });

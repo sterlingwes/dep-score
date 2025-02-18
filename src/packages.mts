@@ -12,7 +12,7 @@ import {
   withUserTags,
 } from "./utils.mjs";
 import { asNumbers, parseSemver } from "./semver.mjs";
-import { calculateScore, semverScoreDiff } from "./score.mjs";
+import { semverScoreDiff } from "./score.mjs";
 
 const defaultOptions: ScoreOptions = {
   includeAge: false,
@@ -111,7 +111,11 @@ const getPackageData = async ({
   );
   const latestSemver = parseSemver(latestVersion);
   const currentSemver = parseSemver(version);
-  const score = semverScoreDiff(currentSemver, latestSemver);
+  const score = semverScoreDiff(
+    currentSemver,
+    latestSemver,
+    options?.shiftLeft?.includes(moduleName)
+  );
   return {
     tags: withUserTags(
       moduleName,
