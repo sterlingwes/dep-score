@@ -1,6 +1,6 @@
 import { describe, it, expect, mock } from "bun:test";
-import { readFileSync, writeFileSync } from "./fs.mts";
-import { getPackages } from "./packages.mts";
+import { readFileSync, writeFileSync } from "./fs.mjs";
+import { getPackages } from "./packages.mjs";
 
 describe("cli", () => {
   const mockExternals = () => {

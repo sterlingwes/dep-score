@@ -1,6 +1,6 @@
 import { describe, it, expect } from "bun:test";
 
-import { calculateScore, semverScoreDiff } from "./score";
+import { calculateScore, semverScoreDiff } from "./score.mjs";
 
 describe("calculateScore", () => {
   it("should use default weights", () => {

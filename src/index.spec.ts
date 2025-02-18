@@ -1,7 +1,7 @@
 import { describe, it, expect, mock } from "bun:test";
 
-import { getDepScore } from "./index.mts";
-import { calculateScore } from "./score.mts";
+import { getDepScore } from "./index.mjs";
+import { calculateScore } from "./score.mjs";
 
 describe("programmatic api", () => {
   const latestVersions = {
@@ -20,7 +20,7 @@ describe("programmatic api", () => {
 
   const mockExternals = () => {
     mock.module("./utils", () => ({
-      readPackageManifest: (moduleName?: string) => {
+      readPackageManifest: (moduleName?: keyof typeof currentVersions) => {
         if (!moduleName) {
           return {
             dependencies: {
@@ -48,7 +48,7 @@ describe("programmatic api", () => {
     }));
 
     mock.module("query-registry", () => ({
-      getAbbreviatedPackument: (name: string) => {
+      getAbbreviatedPackument: (name: keyof typeof latestVersions) => {
         if (!latestVersions[name]) throw new Error(`Unknown package: ${name}`);
         return Promise.resolve({
           "dist-tags": {
@@ -56,7 +56,7 @@ describe("programmatic api", () => {
           },
         });
       },
-      getPackument: (name: string) => {
+      getPackument: (name: keyof typeof latestVersions) => {
         if (!latestVersions[name]) throw new Error(`Unknown package: ${name}`);
         return Promise.resolve({
           "dist-tags": {

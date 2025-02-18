@@ -5,7 +5,7 @@
   "scripts": {
     "bin": "bun build --compile --minify --sourcemap --bytecode ./src/main.ts --outfile bin",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "tsc": "tsc --noEmit",
+    "tsc": "tsc --project tsconfig.lint.json",
     "build": "rm -rf dist/* && tsc && rm dist/package.json && mv dist/src/* dist/ && rm -rf dist/src",
     "fixture": "bun run src/fixtures/fetch.ts"
   },
