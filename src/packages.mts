@@ -79,7 +79,6 @@ const getPackageData = async (
 ): Promise<Metadata> => {
   let version = "";
   if (lockfile?.[moduleName]) {
-    console.log("lockfile", moduleName, lockfile[moduleName].version);
     version = lockfile[moduleName].version;
   }
 
