@@ -93,6 +93,20 @@ describe("programmatic api", () => {
       const result = await getDepScore({ includeDevDependencies: true });
       expect(result.score).toBe(latestScore - currentScore);
     });
+
+    describe("padding", () => {
+      it("should allow for larger segment values", async () => {
+        mockExternals();
+
+        const initialResult = await getDepScore();
+        const largerResult = await getDepScore({ padding: 4 });
+
+        const lodash = 0;
+        const react = +"1900000000" - +"1700000005";
+        const reactNative = +"760001" - +"740008";
+        expect(largerResult.score).toEqual(lodash + react + reactNative);
+      });
+    });
   });
 
   describe("tagging", () => {

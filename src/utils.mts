@@ -2,7 +2,7 @@ import fs from "node:fs";
 import { createRequire } from "node:module";
 import yarnLock from "@yarnpkg/lockfile";
 
-import type { Metadata } from "./types.js";
+import type { InternalScoreOptions, Metadata } from "./types.js";
 
 const require = createRequire(process.cwd());
 
@@ -103,4 +103,18 @@ export const withUserTags = (
     return tags;
   }
   return Array.from(new Set([...tags, ...userTags]));
+};
+
+export const withOptions = <T extends Record<string, unknown>>(
+  defaults: T,
+  options: Partial<T>
+) => {
+  const result = { ...defaults };
+  const fields: Array<keyof T> = Object.keys(options);
+  for (const field of fields) {
+    if (options[field]) {
+      result[field] = options[field];
+    }
+  }
+  return result;
 };

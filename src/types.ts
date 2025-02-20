@@ -14,6 +14,8 @@ export interface ScoreOptions {
   includeDevDependencies?: boolean;
   tagGroups?: Record<string, string[]>;
   shiftLeft?: string[];
+  allowOverflow?: boolean;
+  padding?: number;
 }
 
 export interface InternalScoreOptions extends ScoreOptions {

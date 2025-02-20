@@ -1,8 +1,19 @@
-const leftPad = (value: number, padding = 3) => {
-  return value.toString().padStart(padding, "0");
+const leftPad = (value: string, padding: number) => {
+  return value.padStart(padding, "0");
 };
 
-export const calculateScore = (semver: string[], shiftLeft = false): number => {
+export const defaultScoreOptions = {
+  shiftLeft: false,
+  allowOverflow: false,
+  padding: 3,
+};
+
+export const calculateScore = (
+  semver: string[],
+  options = defaultScoreOptions
+): number => {
+  const { allowOverflow, shiftLeft, padding } = options;
+
   const parts = semver.slice();
   if (shiftLeft) {
     parts.shift();
@@ -12,8 +23,11 @@ export const calculateScore = (semver: string[], shiftLeft = false): number => {
   let segments = 0;
   while (parts.length) {
     segments++;
-    const value = parts.pop() ?? "0";
-    score = `${leftPad(+value)}${score}`;
+    let value = parts.pop() ?? "0";
+    if (!allowOverflow && value.length > padding && value[0] !== "0") {
+      value = "9".repeat(padding);
+    }
+    score = `${leftPad(value, padding)}${score}`;
   }
 
   return +score;
@@ -22,9 +36,9 @@ export const calculateScore = (semver: string[], shiftLeft = false): number => {
 export const semverScoreDiff = (
   current: string[],
   latest: string[],
-  shiftLeft = false
+  options = defaultScoreOptions
 ): number => {
-  const currentScore = calculateScore(current, shiftLeft);
-  const latestScore = calculateScore(latest, shiftLeft);
+  const currentScore = calculateScore(current, options);
+  const latestScore = calculateScore(latest, options);
   return latestScore - currentScore;
 };

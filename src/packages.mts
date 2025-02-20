@@ -9,10 +9,11 @@ import {
   invertTagGroups,
   readPackageManifest,
   readYarnLockfile,
+  withOptions,
   withUserTags,
 } from "./utils.mjs";
 import { asNumbers, parseSemver } from "./semver.mjs";
-import { semverScoreDiff } from "./score.mjs";
+import { defaultScoreOptions, semverScoreDiff } from "./score.mjs";
 
 const defaultOptions: ScoreOptions = {
   includeAge: false,
@@ -109,13 +110,15 @@ const getPackageData = async ({
     version,
     options
   );
+  const { allowOverflow, padding } = options ?? {};
+  const scoreOptions = withOptions(defaultScoreOptions, {
+    shiftLeft: options?.shiftLeft?.includes(moduleName),
+    allowOverflow,
+    padding,
+  });
   const latestSemver = parseSemver(latestVersion);
   const currentSemver = parseSemver(version);
-  const score = semverScoreDiff(
-    currentSemver,
-    latestSemver,
-    options?.shiftLeft?.includes(moduleName)
-  );
+  const score = semverScoreDiff(currentSemver, latestSemver, scoreOptions);
   return {
     tags: withUserTags(
       moduleName,

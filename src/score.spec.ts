@@ -2,6 +2,12 @@ import { describe, it, expect } from "bun:test";
 
 import { calculateScore, semverScoreDiff } from "./score.mjs";
 
+const shiftLeft = {
+  shiftLeft: true,
+  allowOverflow: false,
+  padding: 3,
+};
+
 describe("calculateScore", () => {
   it("should use default weights", () => {
     expect(calculateScore(["1", "0", "0"])).toBe(1000000);
@@ -17,9 +23,16 @@ describe("calculateScore", () => {
 
     describe("when asked to shift left", () => {
       it("should shift weights for minor and patch to major and minor", () => {
-        expect(calculateScore(["0", "1", "0"], true)).toBe(1000000);
-        expect(calculateScore(["0", "0", "1"], true)).toBe(1000);
+        expect(calculateScore(["0", "1", "0"], shiftLeft)).toBe(1000000);
+        expect(calculateScore(["0", "0", "1"], shiftLeft)).toBe(1000);
       });
+    });
+  });
+
+  describe("when minor or patch overflows default padding", () => {
+    it("should cap the value", () => {
+      expect(calculateScore(["1", "1000", "0"])).toBe(1999000);
+      expect(calculateScore(["1", "0", "1000"])).toBe(1000999);
     });
   });
 });
@@ -47,9 +60,9 @@ describe("semverScoreDiff", () => {
 
   describe("shift left", () => {
     it("give the same diff to a comparable unshifted version", () => {
-      expect(semverScoreDiff(["0", "19", "0"], ["0", "20", "0"], true)).toBe(
-        1000000
-      );
+      expect(
+        semverScoreDiff(["0", "19", "0"], ["0", "20", "0"], shiftLeft)
+      ).toBe(1000000);
     });
   });
 });
